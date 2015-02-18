@@ -1,3 +1,4 @@
+# understands how to go from a city to another
 class Route
   attr_reader :distance
 
@@ -12,6 +13,14 @@ class Route
 
   def via?(cities)
     stops == cities
+  end
+
+  def stops_count
+    stops.size
+  end
+
+  def to_s
+    stops.reduce("") {|result, stop| result + " -> #{stop}"}
   end
 
   private

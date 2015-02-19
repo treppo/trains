@@ -20,7 +20,7 @@ class Route
   end
 
   def to_s
-    stops.reduce("") {|result, stop| result + " -> #{stop}"}
+    stops.reduce("Start") {|result, stop| result + " -> #{stop}"}
   end
 
   private

@@ -12,14 +12,14 @@ class CityTest < MiniTest::Test
   A >> [E, 7]
 
   def test_distance
-    assert_equal 9, A.through(B, C).distance
-    assert_equal 5, A.through(D).distance
-    assert_equal 13, A.through(D, C).distance
-    assert_equal 22, A.through(E, B, C, D).distance
+    assert_equal 9, A.distance_through(B, C)
+    assert_equal 5, A.distance_through(D)
+    assert_equal 13, A.distance_through(D, C)
+    assert_equal 22, A.distance_through(E, B, C, D)
   end
 
   def test_impossible_route
-    err = assert_raises(ArgumentError) { A.through(E, D).distance }
+    err = assert_raises(ArgumentError) { A.distance_through(E, D) }
     assert_equal 'NO SUCH ROUTE', err.message
   end
 
@@ -29,7 +29,11 @@ class CityTest < MiniTest::Test
   end
 
   def test_shortest_route
-    assert_equal 9, A.shortest_route_to(C)
-    assert_equal 9, B.shortest_route_to(B)
+    assert_equal 9, A.shortest_distance_to(C)
+    assert_equal 9, B.shortest_distance_to(B)
+  end
+
+  def test_distance_less_than
+    assert_equal 7, C.number_of_routes_to(C).with_distance_under(30)
   end
 end

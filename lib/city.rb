@@ -1,6 +1,8 @@
 require_relative 'link'
 require_relative 'route'
 require_relative 'routes_dsl'
+require_relative 'budget/stops'
+require_relative 'budget/distance'
 
 # understands the relationship to its neighbors
 class City
@@ -14,32 +16,34 @@ class City
     neighbor_distance_pair.first
   end
 
-  def through(*others)
-    safe_route_along(others)
+  def distance_through(*others)
+    safe_route_along(others).distance
   end
 
   def number_of_routes_to(city)
     RoutesDSL.new(self, city)
   end
 
-  def shortest_route_to(destination)
-    shortest_routes(destination).min_by {|route| route.distance}.distance
+  def routes_count(destination, budget_type, range)
+    range.reduce(0) do |result, max_budget|
+      result + budget_routes(destination, budget_type.new(max_budget)).size
+    end
   end
 
-  def possible_routes(destination, max_stops, visited_cities = [])
-    return [Route.new] if destination == self and visited_cities.size == max_stops
-    return [] if visited_cities.size == max_stops
-    links.flat_map {|link| link.possible_routes(destination, max_stops, visited_cities + [self])}
+  def shortest_distance_to(destination)
+    shortest_sub_routes(destination).min_by {|route| route.distance}.distance
   end
 
-  def shortest_distance_routes(destination, visited_cities = [])
+  def budget_routes(destination, budget)
+    return [Route.new] if destination == self and budget.exhausted?
+    return [] if budget.overdrawn?
+    links.flat_map {|link| link.budget_routes(destination, budget)}
+  end
+
+  def shortest_routes(destination, visited_cities = [])
     return [Route.new] if destination == self
     return [] if visited_cities.include?(self)
-    shortest_routes(destination, visited_cities + [self])
-  end
-
-  def possible_routes_count(destination, max_stops)
-    possible_routes(destination, max_stops).size
+    shortest_sub_routes(destination, visited_cities)
   end
 
   def to_s
@@ -57,10 +61,10 @@ class City
   end
 
   def route_along(others)
-    possible_routes(others.last, others.size).find {|route| route.via?(others)}
+    budget_routes(others.last, StopsBudget.new(others.size)).find {|route| route.via?(others)}
   end
 
-  def shortest_routes(destination, visited_cities = [])
-    links.flat_map {|link| link.shortest_distance_routes(destination, visited_cities + [self])}
+  def shortest_sub_routes(destination, visited_cities = [])
+    links.flat_map {|link| link.shortest_routes(destination, visited_cities + [self])}
   end
 end

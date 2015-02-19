@@ -5,15 +5,19 @@ class Link
     @distance = distance
   end
 
-  def possible_routes(*args)
-    target.possible_routes(*args).map {|route| route.prepend(target, distance) }
+  def shortest_routes(destination, visited_cities)
+    target.shortest_routes(destination, visited_cities).map(&method(:prepend_distance))
   end
 
-  def shortest_distance_routes(*args)
-    target.shortest_distance_routes(*args).map {|route| route.prepend(target, distance) }
+  def budget_routes(destination, budget)
+    target.budget_routes(destination, budget - distance).map(&method(:prepend_distance))
   end
 
   private
 
   attr_reader :distance, :target
+
+  def prepend_distance(route)
+    route.prepend(target, distance)
+  end
 end

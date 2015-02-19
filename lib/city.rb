@@ -1,4 +1,4 @@
-require_relative 'link'
+require_relative 'connection'
 require_relative 'route'
 require_relative 'routes_dsl'
 require_relative 'budget/stops'
@@ -12,7 +12,7 @@ class City
   end
 
   def >>(neighbor_distance_pair)
-    links << Link.new(*neighbor_distance_pair)
+    links << Connection.new(*neighbor_distance_pair)
     neighbor_distance_pair.first
   end
 

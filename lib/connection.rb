@@ -1,5 +1,5 @@
 # knows the connection between cities
-class Link
+class Connection
   def initialize(target, distance)
     @target = target
     @distance = distance
